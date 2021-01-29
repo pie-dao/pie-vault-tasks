@@ -30,4 +30,12 @@ task("get-1inch-swap-tx")
         const result = await axios.get(`${baseUrl}${callUrl}`);
 
         console.log(result);
+
+        // TODO compose tx
 });
+
+
+// TODO figure out how to ignore missing approval
+
+
+// TODO Create complete task
