@@ -43,11 +43,15 @@ task("get-uni-like-swap-tx")
         if(taskArgs.deadline) {
             deadline = taskArgs.deadline;
         } else {
-            deadline = Math.round(Date.now() / 1000);
+            deadline = Math.round(Date.now() / 1000) + 60 * 15;
         }
 
-        // TODO: calc min amount
-        const swapTx = await router.populateTransaction.swapExactTokensForTokens(sellAmount, 0, route, taskArgs.to, deadline);
+        const estimatedAmounts = await router.getAmountsOut(sellAmount, route);
+        const estimatedAmount = estimatedAmounts[estimatedAmounts.length -1];
+
+        const minAmount = estimatedAmount.mul(100 - slippage).div(100);
+       
+        const swapTx = await router.populateTransaction.swapExactTokensForTokens(sellAmount, minAmount, route, taskArgs.to, deadline);
 
         const returnData = {
             to: swapTx.to,
@@ -90,7 +94,7 @@ task("get-uni-like-execute-swap-txs")
         const swapTx = await run("get-uni-like-swap-tx", {...taskArgs, log: false});
         transactions.push(swapTx);
 
-        taskArgs.log && console.log(transactions);
+        taskArgs.log && console.log(JSON.stringify(transactions, null, 2));
 
         return transactions;
 });

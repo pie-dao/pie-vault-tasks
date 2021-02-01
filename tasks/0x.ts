@@ -70,7 +70,7 @@ task("get-matcha-order-execute-txs")
         const swapTx = await run("get-matcha-order-tx", {...taskArgs, log: false});
         transactions.push(swapTx);
 
-        taskArgs.log && console.log(transactions);
+        taskArgs.log && console.log(JSON.stringify(transactions, null, 2));
 
         return transactions;
 });

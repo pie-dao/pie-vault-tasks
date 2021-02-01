@@ -3,6 +3,8 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
 
 // tasks
+import "./tasks/multisig";
+import "./tasks/pie";
 import "./tasks/0x";
 import "./tasks/tokenList";
 import "./tasks/tokens";
@@ -27,7 +29,12 @@ task("accounts", "Prints the list of accounts", async (args, {ethers}) => {
 const config: HardhatUserConfig = {
   solidity: "0.7.3",
   networks: {
-    defaultNetwork: {
+    hardhat: {
+      forking: {
+        url: "https://mainnet.infura.io/v3/ffa6c1dc83e44e6c9971d4706311d5ab"
+      }
+    },
+    mainnet: {
       url: "https://mainnet.infura.io/v3/ffa6c1dc83e44e6c9971d4706311d5ab",
       accounts: [
         // never ever actually usse this private key
