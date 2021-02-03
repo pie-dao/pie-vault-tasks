@@ -4,6 +4,9 @@ import { internalTask, task, types } from "hardhat/config";
 import { IERC20Factory } from "../types/ethers-contracts/IERC20Contract";
 
 import { IPieVaultFactory } from "../types/ethers-contracts/IPieVaultContract";
+import { ITokenListUpdaterFactory } from "../types/ethers-contracts/ITokenListUpdaterContract";
+
+const TOKEN_UPDATER = "0xE0e5470E2AFc58F6E8D54C7a4952D029175271AB";
 
 internalTask("get-execute-calls-tx")
     .addParam("pie")
@@ -65,6 +68,20 @@ task("drie-run-tx", "Drie run calls against a pie")
         const tokenAndAmountsAfter = await pieVault.calcTokensForAmount(await pieVault.totalSupply());
         
         await logOutput(tokenAndAmountsBefore, tokenAndAmountsAfter, signer);
+});
+
+internalTask("get-update-tokens-tx", "Updates the token list of a PieVault")
+    .addParam("pie", "pie to update")
+    .addParam("tokens", "tokens to check must be an address", undefined, types.any)
+    .setAction(async(taskArgs, {ethers}) => {
+        const signers = await ethers.getSigners();
+        const tokenListUpdater = ITokenListUpdaterFactory.connect(TOKEN_UPDATER, signers[0]);
+
+        const tokens: string[] = taskArgs.tokens as string[];
+
+        const tx = tokenListUpdater.populateTransaction.update(taskArgs.pie, tokens);
+
+        return tx;
 });
 
 

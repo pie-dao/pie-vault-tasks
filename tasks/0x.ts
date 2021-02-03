@@ -54,6 +54,8 @@ task("get-matcha-order-execute-txs")
         const transactions: any[] = [];
 
         const sellToken = await run("get-token-address-from-symbol", {symbol: taskArgs.sellToken});
+        const buyToken = await run("get-token-address-from-symbol", {symbol: taskArgs.buyToken})
+          
 
         const decimals = await run("get-token-decimals", {tokenAddress: sellToken});
         const sellAmount = parseUnits(taskArgs.sellAmount, decimals);
@@ -69,6 +71,10 @@ task("get-matcha-order-execute-txs")
         //swap
         const swapTx = await run("get-matcha-order-tx", {...taskArgs, log: false});
         transactions.push(swapTx);
+
+        //token update
+        const updateTx = await run("get-update-tokens-tx", {pie: taskArgs.pie, tokens: [sellToken, buyToken]});
+        transactions.push(updateTx);
 
         taskArgs.log && console.log(JSON.stringify(transactions, null, 2));
 
