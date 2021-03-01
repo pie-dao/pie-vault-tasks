@@ -40,7 +40,7 @@ task("get-execute-calls-tx-from-json", "Get execute calls tx from json")
         return returnData;
 });
 
-task("drie-run-tx", "Drie run calls against a pie")
+task("dry-run-tx", "Dry run calls against a pie")
     .addParam("pie")
     .addParam("from")
     .addParam("calls", "path to a json containing the calls")
