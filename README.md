@@ -4,7 +4,7 @@ Tasks for executing swaps on dexes from a PieVault.
 
 ## How to use
 
-Tasks are run to create calls which can be drie run to inspect the result or from which a payload can be generated to submit to the multisig.
+Tasks are run to create calls which can be dry run to inspect the result or from which a payload can be generated to submit to the multisig.
 
 The following commands can be used to list all available tasks
 
@@ -48,7 +48,7 @@ Dry running a batch of calls allows us to inspect the changes to balances and th
 
 
 ```
-npx hardhat drie-run-tx --pie [address of the pie] --calls ./calls.json --from [address the tx should be send from can be a multisig address]
+npx hardhat dry-run-tx --pie [address of the pie] --calls ./calls.json --from [address the tx should be send from can be a multisig address]
 ```
 
 ### Preparing calldata
