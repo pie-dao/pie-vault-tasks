@@ -48,6 +48,7 @@ task("get-matcha-order-execute-txs")
     .addParam("buyToken", "Token to buy")
     .addParam("sellAmount", "Amount of token to sell")
     .addParam("slippage", "max allowed slippage in percents 1 == 1% max slippage", 1.0, types.float)
+    .addParam("pie", "address of the pie")
     .addFlag("log", "log the output")
     .setAction(async(taskArgs, { run }) => {
         

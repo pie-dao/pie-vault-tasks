@@ -68,7 +68,7 @@ task("get-1inch-swap-execute-txs")
         transactions.push(swapTx);
 
         //token update
-        const updateTx = await run("get-update-tokens-tx", {pie: taskArgs.pie, tokens: [sellToken, buyToken]});
+        const updateTx = await run("get-update-tokens-tx", {pie: taskArgs.to, tokens: [sellToken, buyToken]});
         transactions.push(updateTx);
 
         taskArgs.log && console.log(JSON.stringify(transactions, null, 2));
