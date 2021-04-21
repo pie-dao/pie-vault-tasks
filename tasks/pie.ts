@@ -1,11 +1,13 @@
-import { formatUnits, parseUnits } from "@ethersproject/units";
+import { formatEther, formatUnits, parseUnits } from "@ethersproject/units";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { utils } from "ethers";
 import { internalTask, task, types } from "hardhat/config";
 import { IERC20Factory } from "../types/ethers-contracts/IERC20Contract";
+import { IMasterChefFactory } from "../types/ethers-contracts/IMasterChefContract";
 
 import { IPieVaultFactory } from "../types/ethers-contracts/IPieVaultContract";
 import { ITokenListUpdaterFactory } from "../types/ethers-contracts/ITokenListUpdaterContract";
+import { SUSHI_MASTERCHEF } from "./uniswap";
 
 const TOKEN_UPDATER = "0xE0e5470E2AFc58F6E8D54C7a4952D029175271AB";
 
@@ -34,11 +36,31 @@ task("get-execute-calls-tx-from-json", "Get execute calls tx from json")
     .addFlag("log", "log the output")
     .setAction(async (taskArgs, {ethers, run}) => {
         const calls = require(`${process.cwd()}/${taskArgs.calls}`);
+        const signers = await ethers.getSigners();
         const returnData = await run("get-execute-calls-tx", { pie: taskArgs.pie, calls: calls});
 
         taskArgs.log && console.log(JSON.stringify(returnData, null, 2));
 
         return returnData;
+});
+
+task("dry-run-staking-masterchef-tx", "Get execute calls tx from json")
+    .addParam("pie")
+    .addParam("from")
+    .addParam("lpToken", "Token to stake")
+    .addParam("masterchef", "Address of the masterchef", SUSHI_MASTERCHEF)
+    .addParam("calls", "path to json containing calls to execute")
+    .setAction(async (taskArgs, {ethers, run}) => {
+        const signers = await ethers.getSigners();
+
+        const returnData = await run("dry-run-tx", { pie: taskArgs.pie, calls: taskArgs.calls, from: taskArgs.from });
+        const poolId = await run("get-masterchef-poolid-lp", { lpToken: taskArgs.lpToken, masterchef: taskArgs.masterchef });
+        const masterchef = await IMasterChefFactory.connect(taskArgs.masterchef, signers[0]);
+
+        const userInfo = await masterchef.userInfo(poolId, taskArgs.pie);
+        
+        console.log('Amount: ', formatEther(userInfo.amount));
+        console.log('RewardDebt: ', formatEther(userInfo.rewardDebt));
 });
 
 task("dry-run-tx", "Dry run calls against a pie")
@@ -79,10 +101,7 @@ task("dry-run-tx", "Dry run calls against a pie")
             const balanceTokenAfter = formatUnits(await targetToken.balanceOf(taskArgs.pie), decimal);
             console.log('balanceTokenAfter', balanceTokenAfter.toString())
         }
-        
-        
         await logOutput(tokenAndAmountsBefore, tokenAndAmountsAfter, signer);
-        
 });
 
 internalTask("get-update-tokens-tx", "Updates the token list of a PieVault")
