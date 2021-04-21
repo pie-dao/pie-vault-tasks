@@ -1,3 +1,4 @@
+import { formatUnits, parseUnits } from "@ethersproject/units";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { utils } from "ethers";
 import { internalTask, task, types } from "hardhat/config";
@@ -43,7 +44,9 @@ task("get-execute-calls-tx-from-json", "Get execute calls tx from json")
 task("dry-run-tx", "Dry run calls against a pie")
     .addParam("pie")
     .addParam("from")
+    .addOptionalParam("targetTokenCheck")
     .addParam("calls", "path to a json containing the calls")
+
     .setAction(async(taskArgs, {ethers, run, network}) => {
         
         await network.provider.request({
@@ -62,12 +65,24 @@ task("dry-run-tx", "Dry run calls against a pie")
         await signer.sendTransaction({
             to: transaction.to,
             data: transaction.data,
-            value: 0
+            value: 0,
+            gasPrice: 0
         });
 
         const tokenAndAmountsAfter = await pieVault.calcTokensForAmount(await pieVault.totalSupply());
+
+        if(taskArgs.targetTokenCheck) {
+            console.log('taskArgs.targetTokenCheck', taskArgs.targetTokenCheck);
+            const decimal = await run("get-token-decimals", {tokenAddress: taskArgs.targetTokenCheck});
+            console.log('decimal', decimal);
+            const targetToken = IERC20Factory.connect(taskArgs.targetTokenCheck, signer);
+            const balanceTokenAfter = formatUnits(await targetToken.balanceOf(taskArgs.pie), decimal);
+            console.log('balanceTokenAfter', balanceTokenAfter.toString())
+        }
+        
         
         await logOutput(tokenAndAmountsBefore, tokenAndAmountsAfter, signer);
+        
 });
 
 internalTask("get-update-tokens-tx", "Updates the token list of a PieVault")
