@@ -13,7 +13,7 @@ import "./tasks/tokens";
 import "./tasks/uniswap";
 import "./tasks/1inch";
 import "./tasks/facets";
-
+import "./tasks/balancer";
 
 
 // This is a sample Hardhat task. To learn how to create your own go to

@@ -72,10 +72,11 @@ task("dry-run-tx", "Dry run calls against a pie")
         const tokenAndAmountsAfter = await pieVault.calcTokensForAmount(await pieVault.totalSupply());
 
         if(taskArgs.targetTokenCheck) {
+            const targetTokenAddress = await run("get-token-address-from-symbol", {symbol: taskArgs.targetTokenCheck});
             console.log('taskArgs.targetTokenCheck', taskArgs.targetTokenCheck);
-            const decimal = await run("get-token-decimals", {tokenAddress: taskArgs.targetTokenCheck});
+            const decimal = await run("get-token-decimals", {tokenAddress: targetTokenAddress});
             console.log('decimal', decimal);
-            const targetToken = IERC20Factory.connect(taskArgs.targetTokenCheck, signer);
+            const targetToken = IERC20Factory.connect(targetTokenAddress, signer);
             const balanceTokenAfter = formatUnits(await targetToken.balanceOf(taskArgs.pie), decimal);
             console.log('balanceTokenAfter', balanceTokenAfter.toString())
         }
